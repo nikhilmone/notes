@@ -55,7 +55,8 @@ https://docs.openshift.com/enterprise/3.0/admin_guide/manage_authorization_polic
 
 
 
- ######################################################## GitLab Installation
+ ## GitLab Installation
+ ```
  192  yum install -y curl openssh-server openssh-clients cronie
 193  lokkit -s http -s ssh
 194  yum install lokkit
@@ -94,18 +95,21 @@ https://docs.openshift.com/enterprise/3.0/admin_guide/manage_authorization_polic
 227  ps -ef | grep -i postgres
 228  lsof -i:5432
 229  lsof -i:9187
-
+```
 
 ### To start containers without root
+
+```
 usermod -aG wheel nikhil
 usermod -aG docker nikhil
-
+```
 
 ## docker-compose
 
 
 ##### Upload docker images to openshift
 
+```
 719  oc get -is
 720  docker images
 721  docker rmi 172.30.1.1:5000/d2d/d2d_backend
@@ -125,24 +129,24 @@ usermod -aG docker nikhil
 735  oc project
 736  oc get is
 737  docker run -it d2d
-
+```
 
 
 
 ##### Docker installation
 
 
-
+```
 My Server : 10.210.16.102
 
 nikhil@123
 123@wipro
 sudo su -   yabadabad
-
+```
 
 
 ######### Private Docker Registry ##########
-
+```
 docker pull 10.210.16.102:5000/my-ubuntu
 
 
@@ -167,28 +171,30 @@ docker pull 10.210.16.102:5000/my-ubuntu
 
 curl http://10.210.16.102:5000/v2/_catalog
 {"repositories":["my-ubuntu"]}
+```
 
-
-ssh tunneling :
-
+#ssh tunneling :
+```
 ssh -f <user>@<remote-ip> -L <local-ip>:<local-port>:<remote-ip>:<remote-port> -N
+```
 
-
-#### Registry UI
+# Registry UI
+```
 docker run -p 80:8080 -e REG1=http://10.210.16.102:5000 atcol/docker-registry-ui
 
 docker run -it -p 8080:8080 --restart=always --name registry-web --link registry -e REGISTRY_URL=http://10.210.16.157:8000/v2 -e REGISTRY_NAME=http://10.210.16.157:5000/v2 hyper/docker-registry-web
-
-#### Nexus Repository Manager
+```
+# Nexus Repository Manager
 
 https://github.com/TerrenceMiao/nexus/wiki/Setup-Docker-Private-Registry-in-Nexus-Repository-OSS-3.0.0
-
+```
 docker run -d -p 8081:8081 -p 8082:8082 -p 8083:8083 --restart=always --name nexus -v /home/nikhil/nexus-data:/nexus-data sonatype/nexus3
+```
 
 
+#On client side :
 
-On client side :
-
+```
 137  docker login -u admin -p admin123 10.210.16.204:8082
 138  docker login -u admin -p admin123 10.210.16.204:8083
 
@@ -218,32 +224,34 @@ docker push 10.210.16.204:8083/tomcat:8.5
 115  ls =al
 116  ls -al
 117  docker run -d -p 8081:8081 --restart=always --name nexus -v /home/nikhil/nexus-data:/nexus-data sonatype/nexus3
+```
 
 
-
-######### Run custom images in openshift
+# Run custom images in openshift
+```
 oc login
 oc project d2d
 431  oc whoami -t
 432  docker login -u nikhil -p 8-KysvDi5i4zGz3nw_pgUJPvjASXoDkvldYm1VpQ-mU 172.30.1.1:5000
 433  docker push 172.30.1.1:5000/d2d/tomcat
-
-######## Running priviledged containers
-
+```
+# Running priviledged containers
+```
 oc login <user>
 oc adm policy add-scc-to-user anyuid -z default
 
 oc project <project-name>
 oc adm policy add-scc-to-user anyuid system:serviceaccount:<project-name>:default
 oc new-app --docker-image=10.210.16.204:8083/lrc:0.2 --insecure-registry=true
-
+```
 
 add nexus repo secret in the deployment config ... then deploy
 
 
 
-############ docker-ce installation
+# docker-ce installation
 
+```
 715  yum install -y yum-utils   device-mapper-persistent-data   lvm2
 716  yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
 717  yum install docker-ce
@@ -254,61 +262,74 @@ add nexus repo secret in the deployment config ... then deploy
 722  systemctl start docker
 723  systemctl enable docker
 724  docker ps
+```
 
 
+#  Save and load docker images     document_type_identifier:0.1
 
-##########  Save and load docker images     document_type_identifier:0.1
+```
 docker login -u anonymous -p anonymous
 docker pull 10.210.16.204:8083/document_type_identifier:0.1
 docker save -o document_type_identifier.tar 10.210.16.204:8083/document_type_identifier:0.1
 scp document_type_identifier.tar vmuser@10.210.16.129:~/
 ssh vmuser@10.210.16.129
 docker load -i /home/vmuser/document_type_identifier.tar
+```
 
-
-######## Open Firewall Ports
-
+# Open Firewall Ports
+```
 sudo iptables -I INPUT -p tcp --dport 8080 -j ACCEPT
+```
 
-############# Login to server as desired users
-Check /etc/ssh/sshd_config for allowed users list. If it is OK, the problem is more complex. Try to connect as "ssh codeuser@your-server -v"
+# Login to server as desired users
+Check `/etc/ssh/sshd_config` for allowed users list. If it is OK, the problem is more complex. Try to connect as "ssh codeuser@your-server -v"
 
 
-###### To check the ports opened
-
+# To check the ports opened
+```
 iptables -L -vn
 netstat -tuplen
 
 firewall-cmd --list-ports | grep -w <Port No.>
 iptables --list-rule | grep -w <Port No.>
 sudo nmap -sS 10.210.16.129
-
+```
 ### Ansible password-less login for jenkins :
 
+```
 sudo su -s /bin/bash jenkins
 ssh-keygen -t rsa
 ssh-copy-id vmuser@10.210.16.129
+```
 
 ##### port forwarding
 
 # Forward the 4200 port of remote server to local 8080
+```
 ssh -L 4200:localhost:4200 vmuser@10.210.16.102
 ssh -L 8000:localhost:8000 vmuser@10.210.16.102
 ssh -L 3002:localhost:3002 vmuser@10.210.16.102
 ssh -L 3001:localhost:3001 vmuser@10.210.16.102
 ssh -L 3000:localhost:3000 vmuser@10.210.16.102
+```
 
-########### Disk space issues
+## Docker Disk space issues
+
 #Remove dangling images
+```
 docker images -q --filter dangling=true | xargs docker rmi
 docker images --no-trunc | grep '<none>' | awk '{ print $3 }'| xargs -r docker rmi
 docker ps --filter status=dead --filter status=exited -aq | grep -iv openshift | xargs docker rm -v
+```
+
 # Kill all containers
+```
 docker kill $(docker ps -q)
+```
 
+#Script
 
-Script
-=====
+```
 #!/bin/bash
 
 # remove exited containers:
@@ -321,11 +342,13 @@ docker images --no-trunc | grep '<none>' | awk '{ print $3 }' | xargs -r docker 
 find '/var/lib/docker/volumes/' -mindepth 1 -maxdepth 1 -type d | grep -vFf <(
   docker ps -aq | xargs docker inspect | jq -r '.[] | .Mounts | .[] | .Name | select(.)'
 ) | xargs -r rm -fr
-=====
+```
 
 
 # Compose up individual service
 
+```
 docker-compose stop pdf2html_erm
 
 docker-compose up -d --no-deps pdf2html_erm
+```
