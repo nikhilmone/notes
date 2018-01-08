@@ -1,10 +1,3 @@
-vm.support@wipro.com
-
-vmuser:Wipro@123
-vmuser:123@wipro
-sudo su -
-
-
 Create users :
 
  oc create user nikhil --full-name=NikhilMone
@@ -132,19 +125,6 @@ usermod -aG docker nikhil
 ```
 
 
-
-##### Docker installation
-
-
-```
-My Server : 10.210.16.102
-
-nikhil@123
-123@wipro
-sudo su -   yabadabad
-```
-
-
 ######### Private Docker Registry ##########
 ```
 docker pull 10.210.16.102:5000/my-ubuntu
@@ -154,8 +134,8 @@ docker pull 10.210.16.102:5000/my-ubuntu
 {
    "insecure-registries": [
      "172.30.0.0/16",
-     "10.210.16.204:8083",
-     "10.210.16.204:8082"
+     "10.10.10.10:8083",
+     "10.10.10.10:8082"
    ]
 }
 
@@ -252,18 +232,24 @@ add nexus repo secret in the deployment config ... then deploy
 # docker-ce installation
 
 ```
-715  yum install -y yum-utils   device-mapper-persistent-data   lvm2
-716  yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
-717  yum install docker-ce
-718  yum install http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.21-1.el7.noarch.rpm
-719  yum install docker-ce
-720  clear
-721  docker ps
-722  systemctl start docker
-723  systemctl enable docker
-724  docker ps
-```
+yum install -y yum-utils device-mapper-persistent-data lvm2
+yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+yum install docker-ce
+yum install http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.21-1.el7.noarch.rpm
+yum install docker-ce
 
+docker ps
+systemctl start docker
+systemctl enable docker
+docker ps
+```
+# docker-compose installaion
+
+```
+curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+```
 
 #  Save and load docker images     document_type_identifier:0.1
 
@@ -345,10 +331,12 @@ find '/var/lib/docker/volumes/' -mindepth 1 -maxdepth 1 -type d | grep -vFf <(
 ```
 
 
-# Compose up individual service
+# yum install epel-release 
+
+# Bring up individual service
 
 ```
-docker-compose stop pdf2html_erm
+docker-compose stop <service name>
 
-docker-compose up -d --no-deps pdf2html_erm
+docker-compose up -d --no-deps <service name>
 ```
