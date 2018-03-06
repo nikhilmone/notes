@@ -1,10 +1,3 @@
-vm.support@wipro.com
-
-vmuser:Wipro@123
-vmuser:123@wipro
-sudo su -
-
-
 Create users :
 
  oc create user nikhil --full-name=NikhilMone
