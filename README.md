@@ -1,3 +1,10 @@
+vm.support@wipro.com
+
+vmuser:Wipro@123
+vmuser:123@wipro
+sudo su -
+
+
 Create users :
 
  oc create user nikhil --full-name=NikhilMone
@@ -29,7 +36,7 @@ cp /var/lib/origin/openshift.local.config/master/master-config.yaml /root/
 
 
 ## Start Container Factory
-oc cluster up --host-data-dir=/opt/openshift_data --use-existing-config=true --public-hostname="10.210.16.157" --routing-suffix="10.210.16.157.nip.io"
+oc cluster up --host-data-dir=/opt/openshift_data --use-existing-config=true --public-hostname="10.210.16.157" --routing-suffix="10.210.16.157"
 
 
 
@@ -125,6 +132,19 @@ usermod -aG docker nikhil
 ```
 
 
+
+##### Docker installation
+
+
+```
+My Server : 10.210.16.102
+
+nikhil@123
+123@wipro
+sudo su -   yabadabad
+```
+
+
 ######### Private Docker Registry ##########
 ```
 docker pull 10.210.16.102:5000/my-ubuntu
@@ -134,8 +154,8 @@ docker pull 10.210.16.102:5000/my-ubuntu
 {
    "insecure-registries": [
      "172.30.0.0/16",
-     "10.10.10.10:8083",
-     "10.10.10.10:8082"
+     "10.210.16.204:8083",
+     "10.210.16.204:8082"
    ]
 }
 
@@ -232,11 +252,10 @@ add nexus repo secret in the deployment config ... then deploy
 # docker-ce installation
 
 ```
-yum install -y yum-utils device-mapper-persistent-data lvm2
-yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
-yum install docker-ce
-yum install http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.21-1.el7.noarch.rpm
-yum install docker-ce
+yum install -y yum-utils device-mapper-persistent-data lvm2 -y
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.21-1.el7.noarch.rpm -y
+yum install docker-ce -y
 
 docker ps
 systemctl start docker
@@ -301,6 +320,10 @@ ssh -L 3000:localhost:3000 vmuser@10.210.16.102
 
 ## Docker Disk space issues
 
+# Clean everything:
+
+docker system prune -a
+
 #Remove dangling images
 ```
 docker images -q --filter dangling=true | xargs docker rmi
@@ -311,6 +334,7 @@ docker ps --filter status=dead --filter status=exited -aq | grep -iv openshift |
 # Kill all containers
 ```
 docker kill $(docker ps -q)
+docker stop $(docker ps -aq)
 ```
 
 #Script
@@ -322,7 +346,7 @@ docker kill $(docker ps -q)
 docker ps --filter status=dead --filter status=exited -aq | xargs -r docker rm -v
 
 # remove unused images:
-docker images --no-trunc | grep '<none>' | awk '{ print $3 }' | xargs -r docker rmi
+docker images --no-trunc | grep '<none>' | awk '{ print $3 }' | xargs -r docker rmi -f
 
 # remove unused volumes:
 find '/var/lib/docker/volumes/' -mindepth 1 -maxdepth 1 -type d | grep -vFf <(
@@ -331,12 +355,229 @@ find '/var/lib/docker/volumes/' -mindepth 1 -maxdepth 1 -type d | grep -vFf <(
 ```
 
 
-# yum install epel-release 
+# yum install epel-release
 
 # Bring up individual service
 
 ```
-docker-compose stop <service name>
+docker-compose stop pdf2html_erm
 
-docker-compose up -d --no-deps <service name>
+docker-compose up -d --no-deps pdf2html_erm
 ```
+
+# LDAP details
+
+hyd-mkd-dc03.wipro.com:389
+10.156.50.100
+
+pne-hjn-dc05.wipro.com:389
+10.113.50.100
+
+# CMR for port opening
+CMR# 32428
+
+### Gitlab backup
+vi /etc/gitlab/gitlab.rb
+
+---
+gitlab_rails['manage_backup_path'] = true
+gitlab_rails['backup_path'] = "/AWSGB-D-CTTEST2_data/gitlab_backup"
+
+###! Docs: https://docs.gitlab.com/ce/raketasks/backup_restore.html#backup-archive-permissions
+gitlab_rails['backup_archive_permissions'] = 0644
+
+# gitlab_rails['backup_pg_schema'] = 'public'
+
+###! The duration in seconds to keep backups before they are allowed to be deleted
+gitlab_rails['backup_keep_time'] = 604800
+---
+
+gitlab-rake gitlab:backup:create
+sudo sh -c 'umask 0077; tar -cf $(date "+etc-gitlab-%s.tar") -C / etc/gitlab'
+
+## Nodejs Installation
+
+http://yoember.com/nodejs/the-best-way-to-install-node-js/
+
+
+http://nodejs.org/dist/
+
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
+
+nvm list
+nvm ls-remote
+nvm install 8.9.4
+nvm use 8.9.4
+nvm alias default 8.9.4
+node -v
+npm install -g npm
+npm -v
+
+##############################
+
+8081,8083,8086,8087,8089,8091,8093
+
+liability, duratio, elastic, dno, bold  
+
+ mvn deploy:deploy-file -DgroupId=com.oracle -DartifactId=ojdbc6 -Dversion=11.2.0.3 -Dpackaging=jar -Dfile=ojdbc6.jar -DgeneratePom=true -DrepositoryId=nexus-group -Durl=http://10.210.16.204:8081/repository/nexus-group/
+
+ sudo iptables -I INPUT -p tcp --dport 8893 -j ACCEPT
+
+
+ # Install Apache
+
+ Install Apache:
+First, clean-up yum:
+sudo yum clean all
+As a matter of best practice we’ll update our packages:
+sudo yum -y update
+Installing Apache is as simple as running just one command:
+sudo yum -y install httpd
+Allow Apache Through the Firewall
+Allow the default HTTP and HTTPS port, ports 80 and 443, through firewalld:
+sudo firewall-cmd --permanent --add-port=80/tcp
+sudo firewall-cmd --permanent --add-port=443/tcp
+And reload the firewall:
+sudo firewall-cmd --reload
+
+Configure Apache to Start on Boot
+And then start Apache:
+sudo systemctl start httpd
+Be sure that Apache starts at boot:
+sudo systemctl enable httpd
+Other useful commands for Apache
+To check the status of Apache:
+sudo systemctl status httpd
+To stop Apache:
+sudo systemctl stop httpd
+
+# Install Pip on Ubuntu Jessie 8:
+
+Installing Pip
+Python pip package is available on Debian apt-get package repository. But before we can install pip, we have to install necessary packages to run pip.
+
+# sudo apt-get update
+# sudo apt-get install python-dev build-essential
+Now we can install Pip using the following command:
+
+# sudo apt-get install python-pip
+However the pip version included on Debian apt-get can be outdated, we can upgrade pip to the latest version by using the command below.
+
+# pip install --upgrade pip
+
+
+# To replace a string from all the files in a folder
+
+cd /path/to/your/folder
+sed -i 's/foo/bar/g' *
+
+# pass environment variable to python file
+os.environ['rabbitmq_server']
+
+## environment variable globally:
+```
+[root@AWSGA-D-CTNFS1 ~]# cat /etc/environment
+GOOGLE_APPLICATION_CREDENTIALS=/home/nikhil/negative-news/micro-services/news-search-service/key.json
+```
+```
+[root@AWSGA-D-CTNFS1 ~]# cat ~/.bashrc
+# .bashrc
+export GOOGLE_APPLICATION_CREDENTIALS=/home/nikhil/negative-news/micro-services/news-search-service/key.json
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+```
+
+# Install Rabbitmq:
+
+yum install epel-release
+yum install rabbitmq-server
+
+# install mongodb
+
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
+
+809  vi /etc/yum.repos.d/mongodb-org-3.6.repo
+
+```
+[mongodb-org-3.6]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
+```
+
+```
+[mongodb-org-3.4]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.4/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc
+```
+
+yum install -y mongodb-org
+systemctl status mongod
+systemctl start mongod
+systemctl enable mongod
+systemctl status mongod
+
+# Running cAdvisor
+
+docker run \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:rw \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
+  --publish=8080:8080 \
+  --detach=true \
+  --name=cadvisor \
+  google/cadvisor:latest
+
+
+  docker run   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:rw   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=8099:8080   --detach=true   google/cadvisor:latest
+
+# S3 bucket
+Account ID – wipro-aws
+IAM user – viveks3
+Password –Wipro@123
+
+# NodeJS PM2
+
+CMD ["pm2", "start", "processes.json", "--no-daemon"]
+
+Use a process file to manage these two applications: http://pm2.keymetrics.io/docs/usage/application-declaration/
+
+For example - process.yml:
+
+apps:
+  - script : 'npm'
+    args   : 'run dev'
+    cwd    : './backend'
+    name   : 'backend'
+  - script : 'npm'
+    args   : 'run dev'
+    cwd    : './frontend'
+    name   : 'frontend'
+Then in the Dockerfile:
+
+CMD ['pm2-docker', 'process.yml']
+Documentation about PM2/Docker integration: http://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/
+
+
+## For Python
+
+http://pm2.keymetrics.io/docs/usage/quick-start/
+
+# supervisord
+
+http://supervisord.org/
