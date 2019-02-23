@@ -33,8 +33,6 @@ oc cluster up --host-data-dir=/opt/openshift_data --use-existing-config=true --p
 
 
 
-
-
 time="2017-09-11T11:26:35.567173838Z" level=error msg="response completed with error" err.code=unknown err.detail="denied: requested access to the resource is denied" err.message="unknown error" go.version=go1.7.6 http.request.host="172.30.1.1:5000" http.request.id=21dd6334-4f25-4b3b-b435-dc17062b8b73 http.request.method=HEAD http.request.remoteaddr="10.210.16.157:38182" http.request.uri="/v2/ubs/mypython/blobs/sha256:a0e32aa0faa650a2eb88ddf4bd6d2501520e6ec5203aeb2e78434a3b335ba987" http.request.useragent="docker/17.03.2-ce go/go1.7.5 git-commit/f5ec1e2 kernel/3.10.0-514.21.2.el7.x86_64 os/linux arch/amd64 UpstreamClient(go-dockerclient)" http.response.contenttype="application/json; charset=utf-8" http.response.duration=8.23559ms http.response.status=500 http.response.written=458 instance.id=5d64bfdd-ecdc-418d-9eab-eee9fafef42c openshift.auth.user="system:serviceaccount:ubs:builder" openshift.logger=registry vars.digest="sha256:a0e32aa0faa650a2eb88ddf4bd6d2501520e6ec5203aeb2e78434a3b335ba987" vars.name="ubs/mypython"
 
 ## Cluster users and policies
