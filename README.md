@@ -1,4 +1,4 @@
-Create users :
+Create users:
 
  oc create user nikhil --full-name=NikhilMone
 
@@ -30,8 +30,6 @@ cp /var/lib/origin/openshift.local.config/master/master-config.yaml /root/
 
 ## Start Container Factory
 oc cluster up --host-data-dir=/opt/openshift_data --use-existing-config=true --public-hostname="10.210.16.157" --routing-suffix="10.210.16.157"
-
-
 
 
 
