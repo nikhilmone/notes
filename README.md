@@ -1,4 +1,4 @@
-Create users :
+Create user :
 
  oc create user nikhil --full-name=NikhilMone
 
